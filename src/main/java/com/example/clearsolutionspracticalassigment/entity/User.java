@@ -14,10 +14,6 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
-    public User(UUID uuid) {
-        this.uuid = uuid;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", unique = true, nullable = false)
@@ -45,6 +41,10 @@ public class User {
 
     @Column(name = "phoneNumber")
     private String phoneNumber;
+
+    public User(UUID uuid) {
+        this.uuid = uuid;
+    }
 
     @Override
     public boolean equals(Object o) {
