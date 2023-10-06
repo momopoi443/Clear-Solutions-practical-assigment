@@ -1,31 +1,34 @@
 package com.example.clearsolutionspracticalassigment.controller;
 
-import com.example.clearsolutionspracticalassigment.controller.payload.GetUserResponsePayload;
+import com.example.clearsolutionspracticalassigment.controller.payload.PatchUserRequestPayload;
+import com.example.clearsolutionspracticalassigment.dtos.UserDTO;
 import com.example.clearsolutionspracticalassigment.controller.payload.CreateUserRequestPayload;
 import com.example.clearsolutionspracticalassigment.controller.payload.UpdateUserRequestPayload;
 
-import com.example.clearsolutionspracticalassigment.repository.UserRepository;
 import com.example.clearsolutionspracticalassigment.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Past;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.UUID;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.example.clearsolutionspracticalassigment.controller.validation.ValidationErrorMessages.*;
+
 @RestController
 @RequiredArgsConstructor
+@Validated
 public class UserController {
 
     public static final String USER_PATH = "v1/user";
     public static final String USER_PATH_ID = USER_PATH + "/{userId}";
 
     public final UserService userService;
-    public final UserRepository repository;
 
     @PostMapping(USER_PATH)
     public ResponseEntity<Void> createUser(
@@ -33,7 +36,7 @@ public class UserController {
             @Valid
             CreateUserRequestPayload creationData
     ) {
-        GetUserResponsePayload createdUser = userService.createUser(creationData);
+        UserDTO createdUser = userService.createUser(creationData);
 
         URI createdUserLocation = URI.create(USER_PATH + "/" + createdUser.getUuid());
 
@@ -41,15 +44,15 @@ public class UserController {
     }
 
     @PutMapping(USER_PATH_ID)
-    public ResponseEntity<Void> fullyUpdateUser(
+    public ResponseEntity<Void> updateUser(
             @PathVariable
-            @UUID(message = "Given invalid uuid", allowNil = false)
+            @UUID(message = INVALID_UUID_MESSAGE, allowNil = false)
             String userId,
             @RequestBody
             @Valid
             UpdateUserRequestPayload updatedData
     ) {
-        userService.fullyUpdateUser(
+        userService.updateUser(
                 java.util.UUID.fromString(userId),
                 updatedData
         );
@@ -58,15 +61,15 @@ public class UserController {
     }
 
     @PatchMapping(USER_PATH_ID)
-    public ResponseEntity<Void> partiallyUpdateUser(
+    public ResponseEntity<Void> patchUser(
             @PathVariable
-            @UUID(message = "Given invalid uuid", allowNil = false)
+            @UUID(message = INVALID_UUID_MESSAGE, allowNil = false)
             String userId,
             @RequestBody
             @Valid
-            UpdateUserRequestPayload updatedData
+            PatchUserRequestPayload updatedData
     ) {
-        userService.partiallyUpdateUser(
+        userService.patchUser(
                 java.util.UUID.fromString(userId),
                 updatedData
         );
@@ -77,7 +80,7 @@ public class UserController {
     @DeleteMapping(USER_PATH_ID)
     public ResponseEntity<Void> deleteUser(
             @PathVariable
-            @UUID(message = "Given invalid uuid", allowNil = false)
+            @UUID(message = INVALID_UUID_MESSAGE, allowNil = false)
             String userId
     ) {
         userService.deleteUser(
@@ -88,12 +91,12 @@ public class UserController {
     }
 
     @GetMapping(USER_PATH_ID)
-    public ResponseEntity<GetUserResponsePayload> getUserById(
+    public ResponseEntity<UserDTO> getUserById(
             @PathVariable
-            @UUID(message = "Given invalid uuid", allowNil = false)
+            @UUID(message = INVALID_UUID_MESSAGE, allowNil = false)
             String userId
     ) {
-        GetUserResponsePayload userResponsePayload = userService.getUserById(
+        UserDTO userResponsePayload = userService.getUserById(
                 java.util.UUID.fromString(userId)
         );
 
@@ -101,15 +104,15 @@ public class UserController {
     }
 
     @GetMapping(USER_PATH)
-    public ResponseEntity<List<GetUserResponsePayload>> listUsers(
+    public ResponseEntity<List<UserDTO>> listUsers(
             @RequestParam
-            @Past(message = "Invalid left birth date: it can't be present of future")
+            @Past(message = PAST_BIRTH_DATE_MESSAGE)
             LocalDate birthDateFrom,
             @RequestParam
-            @Past(message = "Invalid right birth date: it can't be present of future")
+            @Past(message = PAST_BIRTH_DATE_MESSAGE)
             LocalDate birthDateTo
     ) {
-        List<GetUserResponsePayload> foundUsers = userService
+        List<UserDTO> foundUsers = userService
                 .findAllUsersByBirthDateBetween(
                         birthDateFrom, birthDateTo
                 );
