@@ -1,7 +1,9 @@
 package com.example.clearsolutionspracticalassigment.controller.payload;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -14,28 +16,17 @@ import static com.example.clearsolutionspracticalassigment.controller.validation
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-/*
-That class is almost similar to update ones,
-but I consider write it due to:
- 1) better readability
- 2) single responsibility principle
-*/
-public class CreateUserRequestPayload {
+public class PatchUserRequestPayload {
 
-    @NotNull(message = NOT_NULL_EMAIL_MESSAGE)
     @Email(
             regexp = EMAIL_PATTERN,
             message = INVALID_EMAIL_MESSAGE
-    )
-    private String email;
+    )    private String email;
 
-    @NotBlank(message = NOT_BLANC_FIRST_NAME_MESSAGE)
     private String firstName;
 
-    @NotBlank(message = NOT_BLANC_LAST_NAME_MESSAGE)
     private String lastName;
 
-    @NotNull(message = NOT_NULL_BIRTH_DATE_MESSAGE)
     @Past(message = PAST_BIRTH_DATE_MESSAGE)
     @JsonFormat(
             shape = JsonFormat.Shape.STRING,
