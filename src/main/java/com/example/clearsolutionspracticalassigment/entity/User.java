@@ -11,7 +11,9 @@ import java.util.UUID;
 @Table(name = "users")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
 
     @Id
@@ -21,7 +23,6 @@ public class User {
 
     @NaturalId
     @Column(name = "uuid", unique = true, nullable = false, updatable = false)
-    @Setter(value = AccessLevel.PRIVATE)
     private UUID uuid;
 
     @Column(name = "email", unique = true, nullable = false)
